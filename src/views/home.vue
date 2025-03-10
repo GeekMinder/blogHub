@@ -1,7 +1,44 @@
 <script setup lang="ts">
+import { watchEffect, ref } from 'vue'
 import { useRouter } from 'vue-router';
-
+import { getAllBlogs } from '../api/blog.ts'
+defineOptions({
+  name: 'HomePage'
+})
 const router = useRouter()
+
+// 总数据
+const allData = ref({})
+
+const handlePageChange = (current) => {
+  console.log(current, 'current');
+
+  pagination.value.current = current
+}
+
+// page
+const pagination = ref({
+  total: 0, current: 1, pageSize: 10, showTotal: true
+})
+
+
+
+const getAllBlogsFunc = async () => {
+  await getAllBlogs({
+    pageSize: pagination.value.pageSize,
+    pageNum: pagination.value.current
+  }).then(res => {
+    if (res.code === 200) {
+      allData.value = res
+      pagination.value.total = res.total
+    }
+  })
+}
+
+watchEffect(async () => {
+  getAllBlogsFunc()
+})
+
 </script>
 
 <template>
@@ -21,10 +58,33 @@ const router = useRouter()
 
           </a-card>
 
-          <a-list :data="[]">
+          <a-list :data="allData.data" :max-height="500" :pagination-props="pagination" @pageChange="handlePageChange">
+            <template #header>
+              所有文章
+            </template>
             <template #empty>
               <a-empty description="暂无文章" />
             </template>
+            <template #item="{ item }">
+              <a-list-item>
+                <a-list-item-meta :title="item.title" :description="item.desc">
+                  <template #avatar>
+                    <a-avatar shape="square">{{ item.title[0] || 'A' }}</a-avatar>
+                  </template>
+                </a-list-item-meta>
+                <template #actions>
+                  <div>
+                    <icon-heart /> {{ item.like_count }} <icon-message /> {{ item.comment_count }} <icon-eye /> {{
+                      item.view_count }}
+                  </div>
+
+                  <icon-edit />
+                  <icon-delete />
+
+                </template>
+              </a-list-item>
+            </template>
+
           </a-list>
         </a-space>
       </a-layout-content>

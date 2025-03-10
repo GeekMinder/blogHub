@@ -12,13 +12,13 @@ import Footer from '@/views/footer.vue'
       <RouterView />
     </template>
     <template #header>
-      <Header />
+      <Header></Header>
     </template>
     <template #sider>
-      <Menu />
+      <Menu></Menu>
     </template>
     <template #footer>
-      <Footer />
+      <Footer></Footer>
     </template>
   </BaseLayout>
 </template>
