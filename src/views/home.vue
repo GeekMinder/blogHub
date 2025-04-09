@@ -1,32 +1,38 @@
 <script setup lang="ts">
 import { watchEffect, ref } from 'vue'
-import { useRouter } from 'vue-router';
-import { getAllBlogs } from '../api/blog.ts'
+import { useRouter } from 'vue-router'
+import { getAllBlogs } from '../api/blog'
 defineOptions({
-  name: 'HomePage'
+  name: 'HomePage',
 })
 const router = useRouter()
 
 // 总数据
 const allData = ref({})
 
-const handlePageChange = (current) => {
-  console.log(current, 'current');
-
+const handlePageChange = (current: number) => {
   pagination.value.current = current
 }
 
+interface PaginationProps {
+  total: number
+  current: number
+  pageSize: number
+  showTotal: boolean
+}
+
 // page
-const pagination = ref({
-  total: 0, current: 1, pageSize: 10, showTotal: true
+const pagination = ref<PaginationProps>({
+  total: 0,
+  current: 1,
+  pageSize: 10,
+  showTotal: true,
 })
-
-
 
 const getAllBlogsFunc = async () => {
   await getAllBlogs({
     pageSize: pagination.value.pageSize,
-    pageNum: pagination.value.current
+    pageNum: pagination.value.current,
   }).then(res => {
     if (res.code === 200) {
       allData.value = res
@@ -38,7 +44,6 @@ const getAllBlogsFunc = async () => {
 watchEffect(async () => {
   getAllBlogsFunc()
 })
-
 </script>
 
 <template>
@@ -53,15 +58,19 @@ watchEffect(async () => {
           <a-card>
             <template #title>欢迎来到 BlogHub! 🎉</template>
             <template #extra>
-              <a-button type="primary" @click="() => router.push('/publish')">开始发布吧</a-button>
+              <a-button type="primary" @click="() => router.push('/publish')"
+                >开始发布吧</a-button
+              >
             </template>
-
           </a-card>
 
-          <a-list :data="allData.data" :max-height="500" :pagination-props="pagination" @pageChange="handlePageChange">
-            <template #header>
-              所有文章
-            </template>
+          <a-list
+            :data="allData.data"
+            :max-height="500"
+            :pagination-props="pagination"
+            @pageChange="handlePageChange"
+          >
+            <template #header> 所有文章 </template>
             <template #empty>
               <a-empty description="暂无文章" />
             </template>
@@ -69,22 +78,22 @@ watchEffect(async () => {
               <a-list-item>
                 <a-list-item-meta :title="item.title" :description="item.desc">
                   <template #avatar>
-                    <a-avatar shape="square">{{ item.title[0] || 'A' }}</a-avatar>
+                    <a-avatar shape="square">{{
+                      item.title[0] || 'A'
+                    }}</a-avatar>
                   </template>
                 </a-list-item-meta>
                 <template #actions>
                   <div>
-                    <icon-heart /> {{ item.like_count }} <icon-message /> {{ item.comment_count }} <icon-eye /> {{
-                      item.view_count }}
+                    <icon-heart /> {{ item.like_count }} <icon-message />
+                    {{ item.comment_count }} <icon-eye /> {{ item.view_count }}
                   </div>
 
                   <icon-edit />
                   <icon-delete />
-
                 </template>
               </a-list-item>
             </template>
-
           </a-list>
         </a-space>
       </a-layout-content>
@@ -92,10 +101,9 @@ watchEffect(async () => {
   </div>
 </template>
 
-
-
 <style scoped>
-.home-container {}
+.home-container {
+}
 
 .arco-layout-header {
   padding: 0 20px;

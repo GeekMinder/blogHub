@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { TokenService } from '../auth/auth'
 
 const request = axios.create({
   baseURL: 'http://localhost:8080/api',
@@ -8,6 +9,10 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   config => {
+    const token = TokenService.getToken()
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
     return config
   },
   error => {
@@ -21,6 +26,28 @@ request.interceptors.response.use(
     return response.data
   },
   error => {
+    if (error.response) {
+      // do something
+      switch (error.response.code) {
+        case 401:
+          TokenService.removeToken()
+          // 重定向到登录页
+          window.location.href = '/login'
+          break
+        case 403:
+          // do something
+          break
+        case 404:
+          // do something
+          break
+        case 500:
+          // do something
+          break
+        default:
+          // do something
+          break
+      }
+    }
     return Promise.reject(error)
   },
 )

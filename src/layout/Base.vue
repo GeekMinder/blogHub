@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <a-layout class="layout-container">
     <!-- header -->
@@ -28,11 +29,7 @@
   </a-layout>
 </template>
 
-
-<script setup lang="ts">
-
-
-</script>
+<script setup lang="ts"></script>
 
 <style scoped lang="less">
 .layout-container {
