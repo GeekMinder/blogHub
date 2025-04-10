@@ -3,12 +3,20 @@
   <div class="login-main">
     <transition name="slide">
       <div class="login-cpn" :key="router.currentRoute.value.path">
-        <div class="login-title">欢迎来到 BlogHub! 🎉</div>
+        <div class="login-title">欢迎{{ isLogin ? '登录' : '注册' }}</div>
         <a-form :model="form" @submit-success="handleSubmit">
-          <a-form-item label="用户名" field="username" required>
+          <a-form-item
+            label="用户名"
+            field="username"
+            :rules="[{ required: true, message: '用户名必填' }]"
+          >
             <a-input v-model="form.username" placeholder="请输入用户名" />
           </a-form-item>
-          <a-form-item label="密码" field="password" required>
+          <a-form-item
+            label="密码"
+            field="password"
+            :rules="[{ required: true, message: '密码必填' }]"
+          >
             <a-input
               v-model="form.password"
               type="password"
@@ -39,6 +47,7 @@ import { useRouter } from 'vue-router'
 import { login, signup } from '@/api/auth'
 import { TokenService } from '@/auth/auth'
 import { Message } from '@arco-design/web-vue'
+import { useUserStore } from '@/stores/user'
 
 const loading = ref(false)
 
@@ -58,13 +67,17 @@ const handleLogin = async () => {
       username: form.username,
       password: form.password,
     })
+
     // 假设后端返回的数据中包含 token
-    // if (res?.token) {
-    //   // 存储 token
-    //   TokenService.setToken(res?.token)
-    // }
+    if (res.data?.token) {
+      // 存储 token
+      TokenService.setToken(res.data?.token)
+    }
     if (res.code === 200) {
       Message.success('登录成功, 等待跳转!')
+      // 用户信息存储
+      const userStore = useUserStore()
+      userStore.setUserInfo(res.data.user)
       setTimeout(() => {
         router.push('/')
       }, 1000)
@@ -75,10 +88,10 @@ const handleLogin = async () => {
     loading.value = false
 
     // 登录成功后跳转
-  } catch (error) {
+  } catch {
     loading.value = false
     // 登录失败
-    Message.error(`登录失败，${error.message}`)
+    Message.error('登录失败')
   }
 }
 
@@ -90,10 +103,7 @@ const handleSignup = async () => {
       username: form.username,
       password: form.password,
     })
-    // 假设后端返回的数据中包含 token
-    // if (res?.token) {
-    //   TokenService.setToken(res?.token)
-    // }
+
     if (res.code === 200) {
       // 注册成功后跳转登录表
       Message.success('注册成功!')
@@ -102,7 +112,7 @@ const handleSignup = async () => {
       Message.error(`注册失败! ${res.message}`)
     }
     loading.value = false
-  } catch (error) {
+  } catch {
     loading.value = false
     // 登录失败
     Message.error('注册失败')

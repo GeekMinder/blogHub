@@ -9,8 +9,11 @@ export const login = (
   data: LoginParams,
 ): Promise<{
   data: {
-    role: number
-    user: string
+    user: {
+      username: string
+      role: number
+    }
+    token: string
   }
   code: number
   message: string

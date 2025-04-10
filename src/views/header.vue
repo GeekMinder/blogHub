@@ -1,8 +1,12 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
   <div class="header-main">
     <div class="header-left">
-      <a-typography-text :style="{ fontSize: '20px', fontWeight: 800, cursor: 'pointer' }" @click="goHome">😍
-        BlogHub</a-typography-text>
+      <a-typography-text
+        :style="{ fontSize: '20px', fontWeight: 800, cursor: 'pointer' }"
+        @click="goHome"
+        >😍 BlogHub</a-typography-text
+      >
     </div>
     <div class="header-right">
       <a-space>
@@ -17,18 +21,41 @@
             <icon-sun-fill size="20px" v-else />
           </template>
         </a-button>
+        <a-popover>
+          <a-button type="text">
+            <template #icon>
+              <icon-user size="20px" />
+            </template>
+          </a-button>
+          <template #content>
+            <a-space direction="vertical">
+              <div>用户名：{{ userStore.userInfo?.username || '' }}</div>
+              <div>
+                角色：{{
+                  userStore.userInfo?.role === 1 ? '管理员' : '普通用户'
+                }}
+              </div>
+              <a-button type="text" @click="handleLogout">退出登录</a-button>
+            </a-space>
+          </template>
+        </a-popover>
       </a-space>
     </div>
   </div>
-
 </template>
 
-
 <script setup lang="ts">
-import { IconMoonFill, IconSunFill, IconGithub } from '@arco-design/web-vue/es/icon'
+import {
+  IconMoonFill,
+  IconSunFill,
+  IconGithub,
+} from '@arco-design/web-vue/es/icon'
 import { useThemeStore } from '@/stores/theme'
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
+import { TokenService } from '@/auth/auth'
+import { Message } from '@arco-design/web-vue'
+import { useUserStore } from '@/stores/user'
 
 // 初始化store
 const themeStore = useThemeStore()
@@ -39,10 +66,18 @@ const { theme } = storeToRefs(themeStore)
 
 const router = useRouter()
 
+const userStore = useUserStore()
+
 function goHome() {
   router.push('/home')
 }
 
+const handleLogout = () => {
+  TokenService.clearTokens()
+  userStore.clearUserInfo()
+  Message.success('退出成功')
+  router.push('/login')
+}
 </script>
 
 <style scoped lang="less">
@@ -50,12 +85,12 @@ function goHome() {
   .flex-between();
   height: 60px;
   width: 100%;
-
 }
 
 .header-left {
   .align-center();
 }
 
-.header-right {}
+.header-right {
+}
 </style>
