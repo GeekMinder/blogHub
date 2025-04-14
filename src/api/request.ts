@@ -1,9 +1,10 @@
 import axios from 'axios'
 import { TokenService } from '../auth/auth'
 import { Message } from '@arco-design/web-vue'
+import { API_BASE_URL } from '@/config/request'
 
 const request = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: API_BASE_URL,
   timeout: 60 * 1000,
 })
 
