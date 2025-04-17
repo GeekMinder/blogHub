@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { watchEffect, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getAllBlogs } from '../api/blog'
+import { getAllBlogs, type GetAllBlogsResponse } from '../api/blog'
 defineOptions({
   name: 'HomePage',
 })
 const router = useRouter()
 
 // 总数据
-const allData = ref({})
+const allData = ref<GetAllBlogsResponse>()
 
 const handlePageChange = (current: number) => {
   pagination.value.current = current
@@ -36,7 +36,7 @@ const getAllBlogsFunc = async () => {
   }).then(res => {
     if (res.code === 200) {
       allData.value = res
-      pagination.value.total = res.total
+      pagination.value.total = res.total || 0
     }
   })
 }
@@ -65,7 +65,7 @@ watchEffect(async () => {
           </a-card>
 
           <a-list
-            :data="allData.data"
+            :data="allData?.data"
             :max-height="500"
             :pagination-props="pagination"
             @pageChange="handlePageChange"
